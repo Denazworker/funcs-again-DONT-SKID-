@@ -1,0 +1,66 @@
+-- Returns the in-game FPS cap.
+getgenv()["getfpscap"] = newcclosure(function()
+    return getrenv()["workspace"]:GetRealPhysicsFPS()
+end)
+
+getgenv()["get_fps_cap"] = getfpscap
+getgenv()["GetFpsCap"] = getfpscap
+getgenv()["getfpscap"] = getfpscap
+
+getgenv().unlockmodulescript = true
+getgenv().getexecutioncontext = function()
+    local runService = game:GetService("RunService")
+    
+    if runService:IsClient() then
+        return "Client"
+    elseif runService:IsServer() then
+        return "Server"
+    else
+        return "Studio"
+    end
+end
+
+getgenv().getallthreads = function()
+    local threads = {}
+    local index = 1
+
+    while true do
+        local thread = debug.getthread(index)
+        if thread then
+            threads[index] = thread
+            index = index + 1
+        else
+            break
+        end
+    end
+
+    return threads
+end
+
+getgenv().securecall = function(Closure, Spoof, ...)
+    assert(typeof(Spoof) == "Instance" and (Spoof.ClassName == "LocalScript" or Spoof.ClassName == "ModuleScript"),
+           "invalid argument #1 to 'securecall' (LocalScript or ModuleScript expected)")
+
+    local OldScript = getfenv().script
+    local OldThreadID = getidentity()
+
+    getfenv().script = Spoof
+    setidentity(2)
+
+    local success, err = pcall(Closure, ...)
+
+    setidentity(OldThreadID)
+    getfenv().script = OldScript
+
+    if not success then
+        error(err)
+    end
+end
+
+getgenv().getactors = function()
+return getproperties(workspace)
+end
+
+getgenv().run_on_actor = function(func, link)
+    return loadstring(link, "=(run_on_actor)", "t", _ENV)
+end
