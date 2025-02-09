@@ -1,3 +1,19 @@
+getgenv().getnamecallmethod = function()
+    local info = debug.getinfo(3, "nS")
+    if info and info.what == "C" then
+        return info.name or "unknown"
+    else
+        return "unknown"
+    end
+end
+
+getnamecallmethod = getgenv().getnamecallmethod
+
+getgenv().getinstances = function()
+	return game:GetDescendants()
+end
+
+getinstances = getgenv().getinstances
 -- Returns the in-game FPS cap.
 getgenv()["getfpscap"] = newcclosure(function()
     return getrenv()["workspace"]:GetRealPhysicsFPS()
