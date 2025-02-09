@@ -61,6 +61,68 @@ getgenv().getactors = function()
 return getproperties(workspace)
 end
 
-getgenv().run_on_actor = function(func, link)
-    return loadstring(link, "=(run_on_actor)", "t", _ENV)
+getgenv().run_on_actor = newcclosure(function(actor, code, argument)
+    assert(typeof(actor) == "Instance", ('bad argument #1 to \'run_on_actor\' (Instance expected, got %s)'):format(typeof(actor)))
+    assert(actor.ClassName == "Actor", ('bad argument #1 to \'run_on_actor\' (Actor expected, got %s)') : format(actor.ClassName))
+    assert(typeof(code) == "string", ('bad argument #2 to \'run_on_actor\' (string expected, got %s)') : format(typeof(code)))
+
+    local custom_env = {
+        isactor = isactor_true
+    };
+    local env = setmetatable({}, {
+        __index = newcclosure(function(self, idx)
+            if (custom_env[idx]) then return custom_env[idx] end
+            return getgenv()[idx]
+        end),
+        __newindex = newcclosure(function(self, idx, val)
+            custom_env[idx] = val
+        end)
+    })
+
+    setfenv(loadstring(code), env)(argument)
+end)
+
+getgenv().gethui = function()
+    local success, hui = pcall(function()
+        return game:GetService("CoreGui")["RobloxGui"]
+    end)
+    if success then
+        return hui
+    else
+        warn("Failed to get RobloxGui")
+        return nil
+    end
 end
+
+getgenv().getnilinstances = newcclosure(function()
+    local instances = {}
+
+	local idx = 1
+    for i,v in getinstancelist() do
+        if (typeof(v) == "Instance" and v.Parent == nil) then 
+            rawset(instances, idx, v)
+			idx += 1
+        end
+    end
+
+    return instances
+end)
+
+getgenv().getinstances = newcclosure(function()
+    local instances = {}
+
+	local idx = 1
+    for i,v in getinstancelist() do
+        if (typeof(v) == "Instance") then 
+            rawset(instances, idx, v)
+			idx += 1
+        end
+    end
+
+    return instances
+end)
+
+getinstances = getgenv().getinstances
+getnilinstances = getgenv().getnilinstances
+
+gethui = getgenv().gethui
