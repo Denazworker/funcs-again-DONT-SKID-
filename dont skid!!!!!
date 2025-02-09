@@ -7,7 +7,7 @@ getgenv()["get_fps_cap"] = getfpscap
 getgenv()["GetFpsCap"] = getfpscap
 getgenv()["getfpscap"] = getfpscap
 
-getgenv().unlockmodulescript = true
+
 getgenv().getexecutioncontext = function()
     local runService = game:GetService("RunService")
     
@@ -94,35 +94,6 @@ getgenv().gethui = function()
     end
 end
 
-getgenv().getnilinstances = newcclosure(function()
-    local instances = {}
 
-	local idx = 1
-    for i,v in getinstancelist() do
-        if (typeof(v) == "Instance" and v.Parent == nil) then 
-            rawset(instances, idx, v)
-			idx += 1
-        end
-    end
-
-    return instances
-end)
-
-getgenv().getinstances = newcclosure(function()
-    local instances = {}
-
-	local idx = 1
-    for i,v in getinstancelist() do
-        if (typeof(v) == "Instance") then 
-            rawset(instances, idx, v)
-			idx += 1
-        end
-    end
-
-    return instances
-end)
-
-getinstances = getgenv().getinstances
-getnilinstances = getgenv().getnilinstances
 
 gethui = getgenv().gethui
